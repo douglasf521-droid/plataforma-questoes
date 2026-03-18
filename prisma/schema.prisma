@@ -1,0 +1,55 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Questao {
+  id        Int     @id @default(autoincrement())
+  pergunta  String
+  opcaoA    String
+  opcaoB    String
+  opcaoC    String
+  opcaoD    String
+  respostaCorreta String // A, B, C ou D
+  explicacao String
+  materia   String
+  banca     String
+  nivel     String  // fácil, médio, difícil
+  fonte     String? // Onde a questão veio (ex: ENEM 2023)
+  criadoEm  DateTime @default(now())
+  
+  respostas Resposta[]
+  
+  @@index([materia])
+  @@index([banca])
+  @@index([nivel])
+}
+
+model Usuario {
+  id    Int     @id @default(autoincrement())
+  nome  String
+  email String  @unique
+  pontuacao Int @default(0)
+  criadoEm  DateTime @default(now())
+  
+  respostas Resposta[]
+}
+
+model Resposta {
+  id    Int     @id @default(autoincrement())
+  questaoId Int
+  usuarioId Int
+  respostaDada String // A, B, C ou D
+  acertou Boolean
+  criadoEm  DateTime @default(now())
+  
+  questao Questao @relation(fields: [questaoId], references: [id])
+  usuario Usuario @relation(fields: [usuarioId], references: [id])
+}
